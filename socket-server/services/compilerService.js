@@ -1,29 +1,21 @@
-const axios = require("axios");
+const compiler = require("../compiler/dockerCompiler");
 
-class CompilerService {
+class CompilerService{
 
-    async execute(language, sourceCode, stdin = "") {
+    async execute(language,code,input){
 
-        const response = await axios.post(
-            "https://emkc.org/api/v2/piston/execute",
-            {
-                language: language,
-                version: "*",
-                files: [
-                    {
-                        content: sourceCode
-                    }
-                ],
-                stdin: stdin
-            },
-            {
-                timeout: 30000
-            }
+        return await compiler.execute(
+
+            language,
+
+            code,
+
+            input
+
         );
 
-        return response.data;
     }
 
 }
 
-module.exports = new CompilerService();
+module.exports=new CompilerService();

@@ -8,31 +8,24 @@ class CompilerController {
 
             const { language, code, input } = req.body;
 
-            if (!language || !code) {
-                return res.status(400).json({
-                    success: false,
-                    error: "Language and code are required."
-                });
-            }
-
             const result = await compilerService.execute(
                 language,
                 code,
-                input || ""
+                input
             );
 
-            return res.json({
-                success: true,
-                result
+            res.json({
+                success: result.success,
+                output: result.output
             });
 
         } catch (err) {
 
-            console.error(err.response?.data || err.message);
+            console.error(err);
 
-            return res.status(500).json({
+            res.status(500).json({
                 success: false,
-                error: err.response?.data || err.message
+                output: err.message
             });
 
         }

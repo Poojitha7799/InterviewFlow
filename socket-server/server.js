@@ -4,10 +4,29 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 require('dotenv').config();
 
+const authRoutes = require('./routes/authRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+const studentRoutes = require('./routes/studentRoutes');
+const aiRoutes = require('./routes/aiRoutes');
+const replayRoutes = require('./routes/replayRoutes');
+const compilerRoutes = require('./routes/compilerRoutes');
+
+const initInterviewSocket = require('./socket/interviewSocket');
+
 const app = express();
+
 app.use(cors({ origin: 'http://localhost:3000' }));
+app.use(express.json());
+
+app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/student', studentRoutes);
+app.use('/api/ai', aiRoutes);
+app.use('/api/replay', replayRoutes);
+app.use('/api/compiler', compilerRoutes);
 
 const server = http.createServer(app);
+
 const io = new Server(server, {
   cors: {
     origin: 'http://localhost:3000',
@@ -15,24 +34,10 @@ const io = new Server(server, {
   }
 });
 
-io.on('connection', (socket) => {
-  console.log(`🔌 User connected to socket sync engine: ${socket.id}`);
+initInterviewSocket(io);
 
-  socket.on('join_room', (roomId) => {
-    socket.join(roomId);
-    console.log(`📁 User ${socket.id} joined room context: ${roomId}`);
-  });
+const PORT = process.env.PORT || 5001;
 
-  socket.on('code_change', ({ roomId, code }) => {
-    socket.to(roomId).emit('code_update', code);
-  });
-
-  socket.on('disconnect', () => {
-    console.log(`🔌 User disconnected from sync engine: ${socket.id}`);
-  });
-});
-
-const PORT = process.env.PORT || 5002;
 server.listen(PORT, () => {
-  console.log(`🚀 Socket real-time synchronization link alive at port ${PORT}`);
+  console.log(`🚀 Engine Core Online on Port ${PORT}`);
 });

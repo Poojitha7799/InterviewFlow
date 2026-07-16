@@ -21,6 +21,7 @@ export async function GET(request) {
       candidateCandidates: [],
       securityAlerts: [],
       replayEvents: []
+     
     };
   }
   

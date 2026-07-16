@@ -24,3 +24,72 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@media (max-width: 360px) {
+  /* 1. Reset the navbar layout into a clean, tight block matrix */
+  nav.w-full.h-16.flex.items-center.justify-between,
+  nav[class*="justify-between"],
+  .fixed.top-0.w-full {
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 10px 8px !important;
+    gap: 8px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 2. Target the main brand logo to remain prominent at the top center */
+  nav.w-full.h-16.flex.items-center.justify-between > span:first-child,
+  nav.w-full.h-16.flex.items-center.justify-between > div:first-child span {
+    font-size: 14px !important;
+    margin-bottom: 2px !important;
+    display: block !important;
+    text-align: center !important;
+    width: 100% !important;
+  }
+
+  /* 3. Re-arrange all links and control elements into a perfectly spaced 2-column grid */
+  nav.w-full.h-16.flex.items-center.justify-between > div.flex.items-center,
+  nav div[class*="items-center"],
+  nav .flex {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 0 4px !important;
+  }
+
+  /* 4. Format links into clickable pill actions that fit the iPhone SE width perfectly */
+  nav span, 
+  nav a, 
+  nav button,
+  div[class*="items-center"] span,
+  div[class*="items-center"] a {
+    font-size: 11px !important;
+    padding: 6px 4px !important;
+    background-color: #171717 !important;
+    border: 1px solid #262626 !important;
+    border-radius: 6px !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    display: block !important;
+  }
+
+  /* 5. Force specific full-width prioritization for standalone text or disconnect actions */
+  nav a[href*="disconnect"], 
+  nav button:last-child {
+    grid-column: span 2 !important;
+  }
+
+  /* 6. Push the center landing page down smoothly so it doesn't overlap the compact menu grid */
+  main,
+  .mt-16,
+  div.flex-1.flex.flex-col.items-center {
+    margin-top: 160px !important;
+  }
+}

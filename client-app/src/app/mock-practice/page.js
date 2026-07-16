@@ -8,7 +8,7 @@ export default function MockPracticeView() {
   const [code, setCode] = useState('');
   const [customInput, setCustomInput] = useState('');
   const [consoleOutput, setConsoleOutput] = useState('System: Environment initialized. Ready for script compilation.');
-  const [consoleHeight, setConsoleHeight] = useState(220);
+  const [consoleHeight, setConsoleHeight] = useState(150);
   const [isLoading, setIsLoading] = useState(true);
   
   const [hasCompiled, setHasCompiled] = useState(false);
@@ -91,42 +91,85 @@ export default function MockPracticeView() {
     }
   };
 
+ 
   const executeCodeSimulation = async () => {
-    if (!activeProblem) return;
-    setConsoleOutput((prev) => prev + `\n[COMPILING]: Routing script to local compiler service running on port 5001...`);
-    setHasCompiled(true);
 
-    try {
-      const response = await fetch("http://localhost:5001/api/compiler/run", {
+  if (!activeProblem) return;
+
+  setHasCompiled(true);
+
+  setConsoleOutput(prev =>
+    prev +
+    "\n[COMPILING]: Routing script to local compiler service running on port 5001..."
+  );
+
+  try {
+
+    console.log("===== ACTIVE PROBLEM =====");
+console.log(activeProblem);
+
+    const response = await fetch(
+      "http://localhost:5001/api/compiler/run",
+      {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({
-          language,
-          languageId: language,
-          code,
-          input: customInput || (activeProblem.testCases?.[0]?.input) || ""
+
+          language: language,
+
+          code: code,
+
+          input: customInput.trim() !== ""
+    ? customInput
+    : activeProblem.sample_input
+
         })
-      });
-
-      const data = await response.json();
-      let logResult = `\n--- LIVE SANDBOX EXECUTION REPORT (${activeProblem.title}) ---`;
-
-      if (!data.success) {
-        logResult += `\n❌ SERVICE ERROR\n\n${data.error}`;
-      } else {
-        const result = data.result;
-        if (result.run.code === 0) {
-          logResult += `\n✔ EXECUTION STATUS: SUCCESS\n\n[STANDARD OUTPUT]:\n` + (result.run.stdout || "Program executed successfully.");
-        } else {
-          logResult += `\n❌ EXECUTION STATUS: RUNTIME ERROR\n\n[ERROR LOGS]:\n` + (result.run.stderr || result.run.output || "Unknown runtime error.");
-        }
       }
-      logResult += `\n-----------------------------------`;
-      setConsoleOutput(prev => prev + logResult);
-    } catch (err) {
-      setConsoleOutput((prev) => prev + `\nSystem Error: Local compiler runtime server at port 5001 could not be reached.`);
+    );
+
+    const data = await response.json();
+
+    let logResult = `\n--- LIVE SANDBOX EXECUTION REPORT (${activeProblem.title}) ---`;
+
+    if (response.ok && data.success) {
+
+      logResult += "\n✔ EXECUTION STATUS: SUCCESS";
+
+      logResult += "\n\n[STANDARD OUTPUT]:\n";
+
+      logResult += data.output || "Program executed successfully.";
+
+    } else {
+
+      logResult += "\n❌ EXECUTION STATUS: FAILED";
+
+      logResult += "\n\n[ERROR LOGS]:\n";
+
+      logResult += data.output || "Unknown compiler error.";
+
     }
-  };
+
+    logResult += "\n-----------------------------------";
+    logResult += "\nEvaluation Pass Finished.\n";
+
+    setConsoleOutput(prev => prev + logResult);
+
+  }
+  catch (err) {
+
+    console.error(err);
+
+    setConsoleOutput(prev =>
+      prev +
+      "\nSystem Error: Local compiler runtime server at port 5001 could not be reached."
+    );
+
+  }
+
+};
+
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -294,6 +337,22 @@ export default function MockPracticeView() {
               <textarea value={code} disabled={isSubmitting} onChange={(e) => setCode(e.target.value)} className="absolute inset-0 w-full h-full bg-neutral-950 p-4 text-xs font-mono text-neutral-300 focus:outline-none resize-none leading-relaxed select-text" style={{ tabSize: 4 }} spellCheck="false" />
             </div>
           </div>
+
+
+{/* Custom Input Panel */}
+<div className="mt-3 shrink-0">
+    <h2 className="text-[10px] font-bold uppercase tracking-wider text-purple-400 font-mono mb-2">
+        Custom Input
+    </h2>
+
+    <textarea
+    value={customInput}
+    onChange={(e) => setCustomInput(e.target.value)}
+    placeholder="Example: 10 20"
+    rows={2}
+    className="w-full bg-neutral-950 border border-neutral-900 rounded-xl px-3 py-2 text-xs font-mono text-neutral-300 placeholder-neutral-600 focus:outline-none focus:border-purple-700 resize-y min-h-[30px] max-h-[120px]"
+/>
+</div>
 
           <div style={{ height: `${consoleHeight}px` }} className="bg-neutral-900/20 border border-neutral-900 rounded-2xl p-4 flex flex-col min-h-0 gap-2 backdrop-blur-sm shrink-0 mt-2">
             <h2 className="text-[10px] font-bold uppercase tracking-wider text-purple-400 font-mono">Console Diagnostics</h2>

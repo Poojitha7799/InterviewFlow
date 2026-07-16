@@ -425,39 +425,157 @@ export default function InterviewRoom({ params: paramsPromise }) {
     }
   };
   
-  const handleCustomInputLocalChange = (val) => { 
-    setCustomInput(val); 
-  };
+  const handleCustomInputLocalChange = async (value) => {
 
-  const handleLiveCodeExecution = async () => {
-    if (isRunning) return;
-    setIsRunning(true);
-    const initializingLogs = consoleOutput + `\n[COMPILING]: Routing target scripts to internal secure API sandbox gate...`;
-    setConsoleOutput(initializingLogs);
-
-    let languageId = 71;
-    if (selectedLanguage === 'java') languageId = 62;
-    else if (selectedLanguage === 'cpp') languageId = 54;
-    else if (selectedLanguage === 'c') languageId = 50;
-    else if (selectedLanguage === 'javascript') languageId = 63;
+    setCustomInput(value);
 
     try {
-      const response = await fetch('/api/sandbox', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ source_code: editorCode, language_id: languageId, stdin: customInput || "" }) });
-      const data = await response.json();
-      let logResult = `\n--- LIVE BACKEND SANDBOX EXECUTION REPORT ---\n`;
-      logResult += response.ok && data.status?.id === 3 ? `✔ SUCCESS\n[OUTPUT]: ${data.stdout || '[0,1]'}` : `❌ FAILED\n[LOGS]: ${data.compile_output || data.stderr || ''}`;
-      const completeLogs = initializingLogs + logResult;
-      setConsoleOutput(completeLogs);
-      
-      await fetch('/api/sessions/sync', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ roomId, consoleOutput: completeLogs })
-      });
-    } catch (err) {
-    } finally { setIsRunning(false); }
-  };
 
+        await fetch("/api/sessions/sync", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+
+                roomId,
+
+                customInput: value
+
+            })
+
+        });
+
+    } catch (err) {
+
+        console.error(err);
+
+    }
+
+};
+  const handleLiveCodeExecution = async () => {
+
+    if (isRunning) return;
+
+    setIsRunning(true);
+
+    let logs =
+        consoleOutput +
+        "\n[COMPILING]: Routing source to Docker Compiler...\n";
+
+    setConsoleOutput(logs);
+
+    try {
+
+        const response = await fetch(
+            "http://localhost:5001/api/compiler/run",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+
+                    language: selectedLanguage,
+
+                    code: editorCode,
+
+                    input: customInput
+
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        let result = "";
+
+        if (response.ok && data.success) {
+
+            result +=
+                "\n==============================";
+
+            result +=
+                "\n✔ EXECUTION SUCCESS";
+
+            result +=
+                "\n\nPROGRAM OUTPUT:\n";
+
+            result +=
+                data.output || "(No Output)";
+
+            result +=
+                "\n==============================";
+
+        }
+
+        else {
+
+            result +=
+                "\n==============================";
+
+            result +=
+                "\n❌ EXECUTION FAILED";
+
+            result +=
+                "\n\nERROR:\n";
+
+            result +=
+                data.output || "Unknown Error";
+
+            result +=
+                "\n==============================";
+
+        }
+
+        logs += result;
+
+        setConsoleOutput(logs);
+
+        await fetch("/api/sessions/sync", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+
+                roomId,
+
+                consoleOutput: logs
+
+            })
+
+        });
+
+    }
+
+    catch (err) {
+
+        console.error(err);
+
+        setConsoleOutput(
+
+            logs +
+
+            "\nUnable to connect to Docker Compiler."
+
+        );
+
+    }
+
+    finally {
+
+        setIsRunning(false);
+
+    }
+
+};
   if (!mounted) return <div className="h-screen w-screen bg-[#141414]" />;
   const activeQuestion = questionPaper[activePaperIndex] || null;
 
@@ -617,15 +735,28 @@ export default function InterviewRoom({ params: paramsPromise }) {
                 <button onClick={handleLiveCodeExecution} disabled={isRunning} className="h-7 px-4 bg-purple-600 text-white font-bold text-[10px] font-mono uppercase rounded">{isRunning ? 'Compiling...' : 'Run Code'}</button>
               </div>
             </header>
-            <textarea value={editorCode} onChange={(e) => handleLocalCodeChange(e.target.value)} disabled={isInterviewer} className="flex-1 w-full bg-transparent p-0 pt-2 font-mono text-xs text-[#d4d4d4] outline-none resize-none leading-relaxed" />
+            <textarea value={editorCode} onChange={(e) => handleLocalCodeChange(e.target.value)} className="flex-1 w-full bg-transparent p-0 pt-2 font-mono text-xs text-[#d4d4d4] outline-none resize-none leading-relaxed" />
           </div>
 
           <div onMouseDown={(e) => { e.preventDefault(); isDraggingRef.current = true; }} className="h-2 w-full cursor-ns-resize hover:bg-purple-600/40 transition active:bg-purple-600 my-1 rounded shrink-0 z-30" />
+<div className="py-3 border-t border-neutral-900">
 
+    <div className="text-[10px] font-bold uppercase text-purple-400 font-mono mb-2">
+        CUSTOM INPUT
+    </div>
+
+    <textarea
+        value={customInput}
+        onChange={(e) => handleCustomInputLocalChange(e.target.value)}
+        placeholder="Enter program input..."
+        className="w-full h-14 bg-[#1b1b1b] border border-neutral-800 rounded-lg p-3 text-[12px] font-mono text-neutral-300 resize-none outline-none"
+    />
+
+</div>
           <div style={{ height: `${consoleHeight}px` }} className="flex flex-col min-h-0 bg-transparent pt-2 shrink-0 w-full relative">
             <div className="h-9 flex items-center justify-between shrink-0 select-none">
               <span className="text-[10px] font-bold uppercase text-purple-400 font-mono">Console Diagnostics Logs</span>
-              <input type="text" value={customInput} onChange={(e) => handleCustomInputLocalChange(e.target.value)} disabled={isInterviewer} className="w-72 h-6 bg-transparent text-[10px] text-neutral-400 text-right font-mono" />
+             
             </div>
             <div className="flex-1 font-mono text-[11px] text-neutral-400 overflow-y-auto whitespace-pre-wrap leading-relaxed select-text bg-transparent flex flex-col justify-start">
               <div>{consoleOutput}</div>
