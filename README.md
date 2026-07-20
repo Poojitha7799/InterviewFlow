@@ -215,7 +215,7 @@ GEMINI_API_KEY=your_api_key
 ## Start Backend
 
 ```bash
-npm run dev
+node server.js
 ```
 
 ## Start Frontend
