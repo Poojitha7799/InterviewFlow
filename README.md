@@ -1,166 +1,239 @@
-# InterviewFlow: AI-Based Technical Interview & Coding Assessment Platform
+# InterviewFlow - AI-Powered Technical Interview Platform
 
-An AI-enabled full-stack interview platform that supports mock interviews, live technical interviews, role-based access, coding assessments, and interview management. The platform enables candidates to practice with AI as well as participate in real-time interviews conducted by human interviewers.
+InterviewFlow is a full-stack AI-powered technical interview platform designed to streamline the online interview process. It enables organizations to conduct secure, real-time coding interviews while leveraging Artificial Intelligence to generate interview questions, evaluate candidate responses, and provide performance feedback.
+
+The platform supports three different user roles—**Admin**, **Interviewer**, and **Candidate**—each with dedicated dashboards and functionalities. It combines secure authentication, collaborative coding, AI-assisted interviews, and interview management into a single application.
 
 ---
 
 ## Features
 
-### Candidate
+### Authentication & Security
+- JWT-based authentication
+- HTTP-only cookie session management
+- Role-based access control
+- Protected routes using middleware
+- Secure login and logout functionality
 
-* Register and log in securely.
-* Attend AI-powered mock interviews.
-* Join scheduled live interview sessions.
-* Solve coding problems in the integrated coding workspace.
-* View interview details and assigned problems.
+### Admin Portal
+- Manage interviewers and candidates
+- Schedule technical interviews
+- Assign interviewers to candidates
+- Monitor interview sessions
+- View interview analytics
 
-### Interviewer
+### Interviewer Portal
+- View assigned interviews
+- Conduct live coding interviews
+- Generate AI interview questions
+- Evaluate candidates
+- Submit interview feedback
 
-* Join live interview sessions.
-* Conduct technical interviews with candidates.
-* Communicate with candidates through voice during interviews.
-* Evaluate candidate performance.
-
-### Admin
-
-* Create and schedule interview sessions.
-* Assign interviewers and candidates.
-* Manage interview workflow.
-* Monitor interview activities.
+### Candidate Portal
+- Secure login
+- View scheduled interviews
+- Participate in coding interviews
+- Attend AI-powered mock interviews
+- Receive interview feedback
 
 ### AI Features
+- AI-generated technical interview questions
+- AI-powered mock interviews
+- Automated response evaluation
+- Intelligent interview feedback using Google Gemini AI
 
-* AI-powered mock interview using Google Gemini.
-* AI-generated interview questions.
-* AI-based response evaluation and feedback.
-
----
-
-## Tech Stack
-
-### Frontend
-
-* Next.js
-* React.js
-* JavaScript
-* HTML
-* CSS
+### Real-Time Coding Environment
+- Monaco Editor integration
+- Socket.IO powered live collaboration
+- Real-time code synchronization
+- Live interviewer-candidate interaction
 
 ### Backend
-
-* Node.js
-* Express.js
-
-### Database
-
-* MongoDB
-
-### AI
-
-* Google Gemini API
-
-### Authentication
-
-* JWT Authentication
+- RESTful API architecture
+- Modular Controller-Service-Route pattern
+- Middleware-based authentication
+- Centralized error handling
 
 ---
 
-## Project Structure
+# Tech Stack
 
-```text
-client-app/
-    Frontend (Next.js)
+## Frontend
+- Next.js
+- React.js
+- HTML
+- CSS
+- JavaScript
 
-socket-server/
-    Backend APIs
-    Authentication
-    AI Services
-    Interview Management
-    WebSocket Communication
+## Backend
+- Node.js
+- Express.js
+
+## Database
+- MySQL
+
+## Authentication
+- JWT
+- HTTP-only Cookies
+
+## AI
+- Google Gemini AI
+
+## Real-Time Communication
+- Socket.IO
+
+## Code Editor
+- Monaco Editor
+
+---
+
+# Project Architecture
+
+```
+InterviewFlow
+│
+├── Client (Next.js)
+│   ├── Admin Dashboard
+│   ├── Interviewer Dashboard
+│   ├── Candidate Dashboard
+│   └── Authentication Pages
+│
+├── Server (Node.js + Express)
+│   ├── Controllers
+│   ├── Services
+│   ├── Routes
+│   ├── Middleware
+│   ├── Database
+│   └── Socket.IO Server
+│
+└── MySQL Database
 ```
 
 ---
 
-## Key Functionalities
+# Authentication Flow
 
-* AI mock interview generation
-* Live interview management
-* Role-based authentication (Admin, Interviewer, Candidate)
-* Coding assessment workspace
-* Session scheduling
-* Interview evaluation
-* RESTful APIs
-* Secure authentication using JWT
+1. User logs in.
+2. Credentials are validated.
+3. JWT token is generated.
+4. JWT is stored in an HTTP-only cookie.
+5. Middleware verifies the token.
+6. User is redirected based on role.
+7. Protected APIs are accessible only to authenticated users.
 
 ---
 
-## Installation
+# AI Workflow
 
-### Clone the repository
+1. Candidate starts interview.
+2. Google Gemini generates interview questions.
+3. Candidate answers questions.
+4. AI evaluates responses.
+5. Feedback and scores are displayed.
+
+---
+
+# Live Coding Workflow
+
+1. Interview session starts.
+2. Candidate joins coding room.
+3. Interviewer joins the same room.
+4. Socket.IO synchronizes code changes.
+5. Monaco Editor updates in real time.
+6. Interviewer evaluates coding performance.
+
+---
+
+# Database
+
+The MySQL database stores:
+
+- User accounts
+- Authentication details
+- Interview schedules
+- Coding sessions
+- Interview feedback
+- AI evaluation results
+
+---
+
+# Future Enhancements
+
+- Video calling integration
+- Screen sharing
+- Resume parsing
+- AI cheating detection
+- Automated coding test evaluation
+- Multi-language code execution
+- Interview recording
+- Email notifications
+- Calendar integration
+- Performance analytics dashboard
+
+---
+
+# Installation
+
+## Clone Repository
 
 ```bash
-git clone https://github.com/Poojitha7799/real-time-interview-platform.git
+git clone https://github.com/Poojitha7799/InterviewFlow.git
 ```
 
-### Install frontend dependencies
+## Install Client
 
 ```bash
-cd client-app
+cd client
 npm install
 ```
 
-### Install backend dependencies
+## Install Server
 
 ```bash
-cd ../socket-server
+cd ../server
 npm install
 ```
 
-### Configure environment variables
+## Configure Environment Variables
 
-Create the following files:
+Create a `.env` file inside the server directory.
 
+Example:
+
+```env
+PORT=5000
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=your_password
+DB_NAME=interviewflow
+JWT_SECRET=your_secret_key
+GEMINI_API_KEY=your_api_key
 ```
-client-app/.env.local
-socket-server/.env
-```
 
-Configure:
+---
 
-* MongoDB Connection String
-* JWT Secret
-* Gemini API Key
-
-### Run the frontend
+## Start Backend
 
 ```bash
-cd client-app
 npm run dev
 ```
 
-### Run the backend
+## Start Frontend
 
 ```bash
-cd socket-server
 npm run dev
 ```
 
 ---
 
-## Future Enhancements
-
-* Video interview support
-* AI-generated interview reports
-* Interview recording and replay
-* Email notifications
-* Analytics dashboard
-* Multi-language interview support
-
----
-
-## Author
+# Author
 
 **Poojitha Bathini**
 
 B.Tech Computer Science and Engineering
+
 National Institute of Technology Manipur
+
+GitHub: https://github.com/Poojitha7799
+
+LinkedIn: https://linkedin.com/in/poojitha-bathini
